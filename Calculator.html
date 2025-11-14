@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Multi-Tool Calculator</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#94a3b8;--accent:#7c3aed;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#e6eef8;background:linear-gradient(180deg,#071024 0%,#051428 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .app{width:100%;max-width:980px}
+    .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    h1{margin:0;font-size:18px}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
+    .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border-radius:8px;background:var(--glass);color:var(--muted);cursor:pointer;border:1px solid rgba(255,255,255,0.03);font-size:13px}
+    .tab.active{background:linear-gradient(90deg,var(--accent),#06b6d4);color:white;box-shadow:0 6px 18px rgba(124,58,237,0.14)}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    /* Calculator */
+    .calc{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:14px;border-radius:10px}
+    .display{background:rgba(0,0,0,0.45);padding:12px;border-radius:8px;color:#e6eef8;font-size:20px;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:flex-end}
+    .subdisplay{font-size:12px;color:var(--muted);opacity:0.9}
+    .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+    button.key{padding:14px;border-radius:8px;border:0;background:rgba(255,255,255,0.03);color:#e6eef8;font-size:16px;cursor:pointer}
+    button.op{background:rgba(255,255,255,0.06)}
+    button.eq{grid-column:span 2;background:linear-gradient(90deg,var(--accent),#06b6d4);}
+    .side{display:flex;flex-direction:column;gap:12px}
+    .widget{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:12px;border-radius:10px}
+    .widget h3{margin:0 0 8px 0;font-size:15px}
+    .field{display:flex;gap:8px;align-items:center}
+    .field input, .field select{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:12px}
+    footer.note{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand">
+        <div class="logo">+−</div>
+        <div>
+          <h1>Multi-Tool Calculator</h1>
+          <p class="lead">Basic · Scientific · BMI · Age · Percentage — single-file, offline</p>
+        </div>
+      </div>
+      <div class="small muted">Made with ♥ — standalone HTML/CSS/JS</div>
+    </div>
+
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <div class="tab active" data-tab="basic">Basic</div>
+        <div class="tab" data-tab="scientific">Scientific</div>
+        <div class="tab" data-tab="bmi">BMI</div>
+        <div class="tab" data-tab="age">Age</div>
+        <div class="tab" data-tab="percent">Percentage</div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <!-- Basic / Scientific area (dynamically switches) -->
+          <div id="basic" class="calc pane">
+            <div class="display" id="display">
+              <div class="subdisplay" id="subdisplay">&nbsp;</div>
+              <div id="output">0</div>
+            </div>
+            <div class="keys" id="keys">
+              <button class="key" data-key="7">7</button>
+              <button class="key" data-key="8">8</button>
+              <button class="key" data-key="9">9</button>
+              <button class="key op" data-key="/">÷</button>
+
+              <button class="key" data-key="4">4</button>
+              <button class="key" data-key="5">5</button>
+              <button class="key" data-key="6">6</button>
+              <button class="key op" data-key="*">×</button>
+
+              <button class="key" data-key="1">1</button>
+              <button class="key" data-key="2">2</button>
+              <button class="key" data-key="3">3</button>
+              <button class="key op" data-key="-">−</button>
+
+              <button class="key" data-key="0">0</button>
+              <button class="key" data-key=".">.</button>
+              <button class="key eq" data-key="=">=</button>
+              <button class="key op" data-key="+">+</button>
+
+              <button class="key" data-key="clear">C</button>
+              <button class="key" data-key="back">⌫</button>
+              <button class="key" data-key="(">(</button>
+              <button class="key" data-key=")">)</button>
+            </div>
+          </div>
+
+          <div id="scientific" class="calc pane" style="display:none">
+            <div class="display" id="s_subdisplay">&nbsp;</div>
+            <div class="display" id="s_output" style="margin-top:8px;min-height:48px;align-items:flex-end">0</div>
+            <div class="keys" style="margin-top:12px">
+              <button class="key" data-fn="sin">sin</button>
+              <button class="key" data-fn="cos">cos</button>
+              <button class="key" data-fn="tan">tan</button>
+              <button class="key op" data-fn="pi">π</button>
+
+              <button class="key" data-fn="ln">ln</button>
+              <button class="key" data-fn="log">log</button>
+              <button class="key" data-fn="sqrt">√</button>
+              <button class="key op" data-fn="^">^</button>
+
+              <button class="key" data-fn="pow2">x²</button>
+              <button class="key" data-fn="pow3">x³</button>
+              <button class="key" data-fn="fact">!</button>
+              <button class="key op" data-fn="e">e</button>
+
+              <button class="key" id="s_clear">Clear</button>
+              <button class="key" id="s_rand">Rand</button>
+              <button class="key eq" id="s_eval">Evaluate</button>
+              <button class="key" id="s_copy">Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="side">
+          <div class="widget" id="bmi">
+            <h3>BMI Calculator</h3>
+            <div class="field"><input type="number" id="bmi_w" placeholder="Weight (kg)"></div>
+            <div class="field"><input type="number" id="bmi_h" placeholder="Height (cm)"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><button id="bmi_calc" class="key">Calculate</button><button id="bmi_reset" class="key">Reset</button></div>
+            <p class="muted" id="bmi_out">BMI: — · Category: —</p>
+          </div>
+
+          <div class="widget" id="ageWidget">
+            <h3>Age Calculator</h3>
+            <div class="field"><input type="date" id="dob"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><button id="age_calc" class="key">Calculate</button><button id="age_reset" class="key">Reset</button></div>
+            <p class="muted" id="age_out">Age: —</p>
+          </div>
+
+          <div class="widget" id="percentWidget">
+            <h3>Percentage</h3>
+            <div class="field"><input id="p_a" placeholder="Value A"></div>
+            <div class="field" style="margin-top:8px"><input id="p_b" placeholder="Value B"></div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="p_of" class="key small">A % of B</button>
+              <button id="p_what" class="key small">What % is A of B</button>
+            </div>
+            <p class="muted" id="p_out">—</p>
+          </div>
+
+        </aside>
+      </div>
+
+      <footer class="note">Tip: This page works offline. For currency live rates or file export, ask me to add APIs or download features.</footer>
+    </div>
+  </div>
+
+  <script>
+    // Tabs
+    document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const target=t.dataset.tab;
+      document.querySelectorAll('.pane').forEach(p=>p.style.display='none');
+      document.getElementById(target).style.display='block';
+    }));
+
+    // Basic calculator logic
+    const output = document.getElementById('output');
+    const subdisplay = document.getElementById('subdisplay');
+    let expr = '';
+    function updateDisplay(){ output.textContent = expr || '0'; subdisplay.textContent = expr.length>20?expr.slice(0,20)+'…':'' }
+    document.getElementById('keys').addEventListener('click', e=>{
+      const b = e.target.closest('button'); if(!b) return;
+      const k = b.dataset.key;
+      if(!k) return;
+      if(k==='clear'){ expr=''; updateDisplay(); return }
+      if(k==='back'){ expr = expr.slice(0,-1); updateDisplay(); return }
+      if(k==='='){ try{ const safe = expr.replace(/[^0-9+\-*/().%\s]/g,''); const val = Function('return ('+safe+')')(); expr = String(val); updateDisplay(); }catch(e){ output.textContent='Error' } return }
+      expr += k; updateDisplay();
+    });
+
+    // Scientific
+    const s_output = document.getElementById('s_output');
+    const s_sub = document.getElementById('s_subdisplay');
+    let sExpr = '';
+    function sUpdate(){ s_output.textContent = sExpr || '0'; s_sub.textContent = sExpr.length>36? sExpr.slice(0,36)+'…':'' }
+    document.getElementById('scientific').addEventListener('click', e=>{
+      const b = e.target.closest('button'); if(!b) return;
+      const fn = b.dataset.fn;
+      if(fn){
+        if(fn==='pi'){ sExpr += Math.PI.toFixed(12); sUpdate(); return }
+        if(fn==='e'){ sExpr += Math.E.toFixed(8); sUpdate(); return }
+        if(fn==='sin'||fn==='cos'||fn==='tan'||fn==='ln'||fn==='log'||fn==='sqrt'||fn==='^'||fn==='pow2'||fn==='pow3'||fn==='fact'){
+          sExpr += fn+'('; sUpdate(); return
+        }
+      }
+      if(b.id==='s_clear'){ sExpr=''; sUpdate(); return }
+      if(b.id==='s_rand'){ sExpr = Math.random().toString(); sUpdate(); return }
+      if(b.id==='s_copy'){ navigator.clipboard && navigator.clipboard.writeText(s_output.textContent).then(()=>alert('Copied')) ; return }
+      if(b.id==='s_eval'){
+        try{
+          // parse simple custom expression language produced above
+          let exp = sExpr
+            .replace(/pow2\(/g, 'Math.pow(')
+            .replace(/pow3\(/g, 'Math.pow(')
+            .replace(/sin\(/g,'Math.sin(')
+            .replace(/cos\(/g,'Math.cos(')
+            .replace(/tan\(/g,'Math.tan(')
+            .replace(/ln\(/g,'Math.log(')
+            .replace(/log\(/g,'Math.log10?Math.log10(': 'Math.log(')
+            .replace(/sqrt\(/g,'Math.sqrt(')
+            .replace(/fact\(/g,'(__fact(')
+            .replace(/\^/g,',')
+          // handle factorial wrapper
+          exp = exp.replace(/__fact\(([^)]+)\)/g, '(__fact($1))')
+          const result = eval(exp);
+          sExpr = String(result);
+          sUpdate();
+        }catch(err){ s_output.textContent='Error' }
+      }
+    });
+    function __fact(n){ n = Math.floor(Number(n)); if(isNaN(n)||n<0) return NaN; let r=1; for(let i=2;i<=n;i++) r*=i; return r }
+
+    // BMI
+    document.getElementById('bmi_calc').addEventListener('click', ()=>{
+      const w = parseFloat(document.getElementById('bmi_w').value);
+      const hcm = parseFloat(document.getElementById('bmi_h').value);
+      if(!w||!hcm){ document.getElementById('bmi_out').textContent='Please enter weight and height.'; return }
+      const h = hcm/100; const bmi = w/(h*h);
+      let cat='';
+      if(bmi<18.5) cat='Underweight'; else if(bmi<25) cat='Normal'; else if(bmi<30) cat='Overweight'; else cat='Obese';
+      document.getElementById('bmi_out').textContent = `BMI: ${bmi.toFixed(2)} · Category: ${cat}`;
+    });
+    document.getElementById('bmi_reset').addEventListener('click', ()=>{ document.getElementById('bmi_w').value=''; document.getElementById('bmi_h').value=''; document.getElementById('bmi_out').textContent='BMI: — · Category: —' })
+
+    // Age
+    document.getElementById('age_calc').addEventListener('click', ()=>{
+      const dob = document.getElementById('dob').value; if(!dob){ document.getElementById('age_out').textContent='Pick a date'; return }
+      const b = new Date(dob); const now = new Date(); if(b>now){ document.getElementById('age_out').textContent='DOB is in the future'; return }
+      let y = now.getFullYear()-b.getFullYear(); let m = now.getMonth()-b.getMonth(); let d = now.getDate()-b.getDate();
+      if(d<0){ m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate() }
+      if(m<0){ y--; m+=12 }
+      document.getElementById('age_out').textContent = `Age: ${y} years, ${m} months, ${d} days`;
+    });
+    document.getElementById('age_reset').addEventListener('click', ()=>{ document.getElementById('dob').value=''; document.getElementById('age_out').textContent='Age: —' })
+
+    // Percentage
+    function parseNum(v){ const n=parseFloat(v); return isNaN(n)?null:n }
+    document.getElementById('p_of').addEventListener('click', ()=>{
+      const a=parseNum(document.getElementById('p_a').value); const b=parseNum(document.getElementById('p_b').value);
+      if(a===null||b===null){ document.getElementById('p_out').textContent='Enter both numbers'; return }
+      document.getElementById('p_out').textContent = `${a}% of ${b} = ${(a/100*b).toLocaleString()}`;
+    });
+    document.getElementById('p_what').addEventListener('click', ()=>{
+      const a=parseNum(document.getElementById('p_a').value); const b=parseNum(document.getElementById('p_b').value);
+      if(a===null||b===null){ document.getElementById('p_out').textContent='Enter both numbers'; return }
+      if(b===0){ document.getElementById('p_out').textContent='Division by zero'; return }
+      document.getElementById('p_out').textContent = `${a} is ${((a/b)*100).toFixed(2)}% of ${b}`;
+    });
+
+    // small helpers
+    updateDisplay(); sUpdate();
+  </script>
+</body>
+</html>
